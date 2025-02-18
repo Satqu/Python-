@@ -2,19 +2,15 @@ import wave
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Перевірка наявності файлу
 try:
-    with wave.open('music.wav', 'rb') as wav_file:
-        # Виводимо основну інформацію про файл
+    with wave.open('Nikow.wav', 'rb') as wav_file:
         print("Кількість каналів: ", wav_file.getnchannels())
         print("Частота дискретизації: ", wav_file.getframerate())
         print("Кількість фреймів: ", wav_file.getnframes())
         print("Бітрейт: ", wav_file.getsampwidth() * 8)
 
-        # Зчитуємо всі фрейми
         frames = wav_file.readframes(-1)
 
-        # Визначаємо тип даних на основі розміру семплу
         if wav_file.getsampwidth() == 2:
             dtype = np.int16  # 16-бітний PCM
         elif wav_file.getsampwidth() == 4:
@@ -22,10 +18,8 @@ try:
         else:
             raise ValueError("Непідтримуваний розмір семплу")
 
-        # Перетворюємо байти в масив numpy
         signal = np.frombuffer(frames, dtype=dtype)
 
-        # Якщо файл стерео, розділяємо сигнал на два канали
         if wav_file.getnchannels() == 2:
             left_channel = signal[::2]
             right_channel = signal[1::2]
@@ -34,20 +28,16 @@ try:
         else:
             print("Амплітуди: ", signal[:100])
 
-        # Перевірка, чи всі амплітуди дорівнюють нулю
         if np.all(signal == 0):
             print("Попередження: всі амплітуди дорівнюють нулю. Можливо, файл порожній або пошкоджений.")
 
-    # Відображення звукової хвилі
     plt.figure(figsize=(10, 6))
 
     if wav_file.getnchannels() == 2:
-        # Відображаємо обидва канали, якщо файл стерео
         plt.plot(left_channel[:1000], label="Лівий канал")
         plt.plot(right_channel[:1000], label="Правий канал")
         plt.legend()
     else:
-        # Відображаємо один канал, якщо файл моно
         plt.plot(signal[:1000], label="Моно канал")
         plt.legend()
 
